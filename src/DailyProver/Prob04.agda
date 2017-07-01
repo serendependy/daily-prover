@@ -100,8 +100,43 @@ module Lemmas where
       ≡⟨ eq-f-sx     ⟩ zero
       ≡⟨ sym eq-f-sy ⟩ f (suc y) ∎
 
+  lower-f-surj : ∀ {n} (f : Fin (ℕ.suc n) → Fin (ℕ.suc n)) → (f-inj : Injective f)
+                 → Surjective (lower-f f f-inj) → Surjective f
+  -- f : Fin 1 → Fin 1
+  lower-f-surj {ℕ.zero} f f-inj lf-surj (suc ())
+  lower-f-surj {ℕ.zero} f f-inj lf-surj zero
+    with f zero
+  ... | suc ()
+  ... | zero
+    = zero , refl
+  -- f : Fin (ss n) → Fin (ss n)
+  --- x is suc x
+  lower-f-surj {ℕ.suc n} f f-inj lf-surj (suc x) with lf-surj x
+  ... | lf-surj⟨x⟩
+    with f (suc x) | inspect f (suc x)
+  ---- f (suc x) ≡ suc f⟨sx⟩
+  ... | suc f⟨sx⟩ | [ eq-f⟨sx⟩ ]
+    = (f (suc x)) , sym eq-f⟨sx⟩
+  ---- f (suc x) ≡ zero
+  ... | zero | [ eq-f⟨sx⟩ ]
+    with f zero | inspect f zero
+  ---- f zero ≡ suc f⟨z⟩
+  ... | (suc f⟨z⟩) | [ eq-f⟨z⟩ ]
+    = f (suc x) , (sym eq-f⟨sx⟩)
+  ---- f zero ≡ zero ⇒ ⊥
+  ... | zero | [ eq-f⟨z⟩ ] with f-inj (trans eq-f⟨sx⟩ (sym eq-f⟨z⟩))
+  ... | ()
+  --- x is zero
+  lower-f-surj {ℕ.suc n} f f-inj lf-surj zero = {!!}
+
 Fin-inj-to-surj : ∀ {n} (f : Fin n → Fin n) → Injective f → Surjective f
-Fin-inj-to-surj f f-inj x = {!!}
+Fin-inj-to-surj {ℕ.zero} f f-inj ()
+Fin-inj-to-surj {ℕ.suc n} f f-inj (suc x)
+  with the (Surjective $ Lemmas.lower-f f f-inj) $
+       Fin-inj-to-surj _ (Lemmas.lower-f-inj f _)
+... | lf-surj
+  = Lemmas.lower-f-surj f f-inj lf-surj (suc x)
+Fin-inj-to-surj {ℕ.suc n} f f-inj zero = {!!}
 
 Fin-surj-to-inj : ∀ {n} (f : Fin n → Fin n) → Surjective f → Injective f
 Fin-surj-to-inj f f-surj fx≡fy = {!!}
