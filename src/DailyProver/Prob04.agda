@@ -132,11 +132,42 @@ module FiniteSets where
     ---- f (suc x) is zero
     ... | zero | [ eq-f⟨sx⟩ ]
       with f zero | inspect f zero
-    ... | (suc f⟨z⟩) | [ eq-f⟨z⟩ ] = {!!}
-    ... | zero | eq-f⟨z⟩ = {!!}
+    ---- f zero is suc f⟨z⟩
+    ... | (suc f⟨z⟩) | [ eq-f⟨z⟩ ]
+      = zero , f⟨z⟩≡sy
+      where
+        f⟨z⟩≡sy =
+          begin                 f zero
+          ≡⟨ eq-f⟨z⟩          ⟩ suc f⟨z⟩
+          ≡⟨ cong suc lf⟨x⟩≡y ⟩ suc y ∎
+    ---- f zero is zero ⇒ ⊥
+    ... | zero | [ eq-f⟨z⟩ ]
+      = case sx≡z of λ ()
+      where
+        sx≡z = f-inj (trans eq-f⟨sx⟩ (sym eq-f⟨z⟩))
     --- y is zero
-    lf-surj-f {ℕ.suc n} f f-inj lf-surj zero = {!!}
+    --- I hate to admit it but I wrote this before understanding it...
+    lf-surj-f {ℕ.suc n} f f-inj lf-surj zero
+      with f zero | inspect f zero
+    ... | zero | [ eq-f⟨z⟩ ]
+      = zero , eq-f⟨z⟩
+    ... | suc f⟨z⟩ | [ eq-f⟨z⟩ ]
+      with lf-surj f⟨z⟩
+    ... | x₀ , lf⟨x₀⟩≡f⟨z⟩
+      with f (suc x₀) | inspect f (suc x₀)
+    ... | zero | [ eq-f⟨sx₀⟩ ]
+      = suc x₀ , eq-f⟨sx₀⟩
+    ... | (suc f⟨sx₀⟩) | [ eq-f⟨sx₀⟩ ]
+      = case sx₀≡z of (λ ())
+        where
+        f⟨sx₀⟩≡f⟨z⟩ = lf⟨x₀⟩≡f⟨z⟩
 
+        sx₀≡z : suc x₀ ≡ zero
+        sx₀≡z = f-inj $
+          begin                     f (suc x₀)
+          ≡⟨ eq-f⟨sx₀⟩            ⟩ suc f⟨sx₀⟩
+          ≡⟨ cong suc f⟨sx₀⟩≡f⟨z⟩ ⟩ suc f⟨z⟩
+          ≡⟨ sym eq-f⟨z⟩          ⟩ f zero ∎
 
   Injection-to-Surjection {ℕ.zero} f f-inj ()
   Injection-to-Surjection {ℕ.suc n} f f-inj y
