@@ -31,8 +31,8 @@ module FiniteSets where
   Surjection-to-Injection : ∀ {n} (f : Fin n → Fin n) → Surjective f → Injective f
 
   module Lemmas where
-    lf : ∀ {n} (f : Fin (ℕ.suc n) → Fin (ℕ.suc n)) → Injective f → (Fin n → Fin n)
-    lf f inj i with f (suc i) | inspect f (suc i)
+    lfi : ∀ {n} (f : Fin (ℕ.suc n) → Fin (ℕ.suc n)) → Injective f → (Fin n → Fin n)
+    lfi f inj i with f (suc i) | inspect f (suc i)
     ... | suc j   | _      = j
     ... | zero    | [ f-si≡z ]
       with f zero | inspect f zero
@@ -41,9 +41,9 @@ module FiniteSets where
       with inj (trans f-si≡z (sym f-z≡z))
     ... | ()
 
-    lf-inj : ∀ {n} (f : Fin (ℕ.suc n) → Fin (ℕ.suc n))
-             → (f-inj : Injective f) → Injective (lf f f-inj)
-    lf-inj f f-inj {x} {y} lf⟨x⟩≡lf⟨y⟩
+    lfi-inj : ∀ {n} (f : Fin (ℕ.suc n) → Fin (ℕ.suc n))
+             → (f-inj : Injective f) → Injective (lfi f f-inj)
+    lfi-inj f f-inj {x} {y} lfi⟨x⟩≡lfi⟨y⟩
       with f (suc x) | inspect f (suc x) | f (suc y) | inspect f (suc y)
 
   -- f (suc x) ≡ suc f-sx , f (suc y) ≡ suc f⟨sy⟩ ⇒ ⊤
@@ -53,9 +53,9 @@ module FiniteSets where
         f-x≡f-y : f (suc x) ≡ f (suc y)
         f-x≡f-y =
           begin                     f (suc x)
-          ≡⟨ eq-f⟨sx⟩             ⟩ suc f⟨sx⟩
-          ≡⟨ cong suc lf⟨x⟩≡lf⟨y⟩ ⟩ suc f⟨sy⟩
-          ≡⟨ sym eq-f⟨sy⟩         ⟩ f (suc y)
+          ≡⟨ eq-f⟨sx⟩               ⟩ suc f⟨sx⟩
+          ≡⟨ cong suc lfi⟨x⟩≡lfi⟨y⟩ ⟩ suc f⟨sy⟩
+          ≡⟨ sym eq-f⟨sy⟩           ⟩ f (suc y)
           ∎
 
         x≡y = suc-injective (f-inj f-x≡f-y)
@@ -70,9 +70,9 @@ module FiniteSets where
         sx≡z : suc x ≡ zero
         sx≡z = f-inj $
           begin                     f (suc x)
-          ≡⟨ eq-f⟨sx⟩             ⟩ suc f⟨sx⟩
-          ≡⟨ cong suc lf⟨x⟩≡lf⟨y⟩ ⟩ suc f-z
-          ≡⟨ sym eq-f-z           ⟩ f zero ∎
+          ≡⟨ eq-f⟨sx⟩               ⟩ suc f⟨sx⟩
+          ≡⟨ cong suc lfi⟨x⟩≡lfi⟨y⟩ ⟩ suc f-z
+          ≡⟨ sym eq-f-z             ⟩ f zero ∎
     --- case f-z is zero
     ... | zero     | [ eq-f-z ]
       = let sy≡z : suc y ≡ zero
@@ -80,7 +80,7 @@ module FiniteSets where
         in ⊥-elim $ case sy≡z of (λ {()})
 
     -- f (suc x) ≡ zero , f (suc y) ≡ suc f⟨sy⟩ ⇒ ⊥
-    lf-inj f f-inj {x} {y} lf-x≡lf-y | zero | [ eq-f⟨sx⟩ ] | suc f⟨sy⟩ | [ eq-f⟨sy⟩ ]
+    lfi-inj f f-inj {x} {y} lfi-x≡lfi-y | zero | [ eq-f⟨sx⟩ ] | suc f⟨sy⟩ | [ eq-f⟨sy⟩ ]
       with f zero | inspect f zero
     --- case f-z is suc f-z
     ... | (suc f-z) | [ eq-f-z ]
@@ -89,9 +89,9 @@ module FiniteSets where
         z≡sy : zero ≡ suc y
         z≡sy = f-inj $
           begin                   f zero
-          ≡⟨ eq-f-z             ⟩ suc f-z
-          ≡⟨ cong suc lf-x≡lf-y ⟩ suc f⟨sy⟩
-          ≡⟨ sym eq-f⟨sy⟩       ⟩ f (suc y) ∎
+          ≡⟨ eq-f-z               ⟩ suc f-z
+          ≡⟨ cong suc lfi-x≡lfi-y ⟩ suc f⟨sy⟩
+          ≡⟨ sym eq-f⟨sy⟩         ⟩ f (suc y) ∎
     --- case f-z is zero
     ... | zero | [ eq-f-z ]
       = let sx≡z : suc x ≡ zero
@@ -99,35 +99,35 @@ module FiniteSets where
         in case sx≡z of (λ {()})
 
     -- f (suc x) ≡ zero , f (suc y) ≡ zero ⇒ ⊤
-    lf-inj f f-inj {x} {y} lf-x≡lf-y | zero | [ eq-f⟨sx⟩ ] | zero | [ eq-f⟨sy⟩ ]
+    lfi-inj f f-inj {x} {y} lfi-x≡lfi-y | zero | [ eq-f⟨sx⟩ ] | zero | [ eq-f⟨sy⟩ ]
       = suc-injective ∘ f-inj $
         begin             f (suc x)
         ≡⟨ eq-f⟨sx⟩     ⟩ zero
         ≡⟨ sym eq-f⟨sy⟩ ⟩ f (suc y) ∎
 
-    lf-surj-f : ∀ {n} (f : Fin (ℕ.suc n) → Fin (ℕ.suc n)) → (f-inj : Injective f)
-              → Surjective (lf f f-inj) → Surjective f
+    lfi-surj⇒f-surj : ∀ {n} (f : Fin (ℕ.suc n) → Fin (ℕ.suc n)) → (f-inj : Injective f)
+              → Surjective (lfi f f-inj) → Surjective f
     -- n is zero, trivial (f : Fin 1 → Fin 1)
-    lf-surj-f {ℕ.zero} f f-inj lf-surj (suc ())
-    lf-surj-f {ℕ.zero} f f-inj lf-surj zero
+    lfi-surj⇒f-surj {ℕ.zero} f f-inj lfi-surj (suc ())
+    lfi-surj⇒f-surj {ℕ.zero} f f-inj lfi-surj zero
       with f zero | inspect f zero
     ... | suc () | _
     ... | zero | [ eq-f⟨z⟩ ]
       = zero , eq-f⟨z⟩
     -- n is suc n
     --- y is suc y
-    lf-surj-f {ℕ.suc n} f f-inj lf-surj (suc y)
-      with lf-surj y
-    ... | x , lf⟨x⟩≡y
+    lfi-surj⇒f-surj {ℕ.suc n} f f-inj lfi-surj (suc y)
+      with lfi-surj y
+    ... | x , lfi⟨x⟩≡y
       with f (suc x) | inspect f (suc x)
     ---- f (suc x) is suc f⟨sx⟩
     ... | (suc f⟨sx⟩) | [ eq-f⟨sx⟩ ]
       = suc x , f⟨sx⟩≡sy
         where
           f⟨sx⟩≡sy =
-            begin                 f (suc x)
-            ≡⟨ eq-f⟨sx⟩         ⟩ suc f⟨sx⟩
-            ≡⟨ cong suc lf⟨x⟩≡y ⟩ suc y ∎
+            begin                  f (suc x)
+            ≡⟨ eq-f⟨sx⟩          ⟩ suc f⟨sx⟩
+            ≡⟨ cong suc lfi⟨x⟩≡y ⟩ suc y ∎
 
     ---- f (suc x) is zero
     ... | zero | [ eq-f⟨sx⟩ ]
@@ -137,9 +137,9 @@ module FiniteSets where
       = zero , f⟨z⟩≡sy
       where
         f⟨z⟩≡sy =
-          begin                 f zero
-          ≡⟨ eq-f⟨z⟩          ⟩ suc f⟨z⟩
-          ≡⟨ cong suc lf⟨x⟩≡y ⟩ suc y ∎
+          begin                  f zero
+          ≡⟨ eq-f⟨z⟩           ⟩ suc f⟨z⟩
+          ≡⟨ cong suc lfi⟨x⟩≡y ⟩ suc y ∎
     ---- f zero is zero ⇒ ⊥
     ... | zero | [ eq-f⟨z⟩ ]
       = case sx≡z of λ ()
@@ -147,20 +147,20 @@ module FiniteSets where
         sx≡z = f-inj (trans eq-f⟨sx⟩ (sym eq-f⟨z⟩))
     --- y is zero
     --- I hate to admit it but I wrote this before understanding it...
-    lf-surj-f {ℕ.suc n} f f-inj lf-surj zero
+    lfi-surj⇒f-surj {ℕ.suc n} f f-inj lfi-surj zero
       with f zero | inspect f zero
     ... | zero | [ eq-f⟨z⟩ ]
       = zero , eq-f⟨z⟩
     ... | suc f⟨z⟩ | [ eq-f⟨z⟩ ]
-      with lf-surj f⟨z⟩
-    ... | x₀ , lf⟨x₀⟩≡f⟨z⟩
+      with lfi-surj f⟨z⟩
+    ... | x₀ , lfi⟨x₀⟩≡f⟨z⟩
       with f (suc x₀) | inspect f (suc x₀)
     ... | zero | [ eq-f⟨sx₀⟩ ]
       = suc x₀ , eq-f⟨sx₀⟩
     ... | (suc f⟨sx₀⟩) | [ eq-f⟨sx₀⟩ ]
       = case sx₀≡z of (λ ())
         where
-        f⟨sx₀⟩≡f⟨z⟩ = lf⟨x₀⟩≡f⟨z⟩
+        f⟨sx₀⟩≡f⟨z⟩ = lfi⟨x₀⟩≡f⟨z⟩
 
         sx₀≡z : suc x₀ ≡ zero
         sx₀≡z = f-inj $
@@ -171,10 +171,11 @@ module FiniteSets where
 
   Injection-to-Surjection {ℕ.zero} f f-inj ()
   Injection-to-Surjection {ℕ.suc n} f f-inj y
-    with (Surjective $ Lemmas.lf f f-inj)
-         ∋ Injection-to-Surjection _ (Lemmas.lf-inj f _)
-  ... | lf-surj
-    = Lemmas.lf-surj-f f f-inj lf-surj y
+    with (Surjective $ Lemmas.lfi f f-inj)
+         ∋ Injection-to-Surjection _ (Lemmas.lfi-inj f _)
+  ... | lfi-surj
+    = Lemmas.lfi-surj⇒f-surj f f-inj lfi-surj y
 
-  Surjection-to-Injection = {!!}
+  Surjection-to-Injection {ℕ.zero} f f-surj {()} f⟨x⟩≡f⟨y⟩
+  Surjection-to-Injection {ℕ.suc n} f f-surj f⟨x⟩≡f⟨y⟩ = {!!}
 
