@@ -169,6 +169,20 @@ module FiniteSets where
           ≡⟨ cong suc f⟨sx₀⟩≡f⟨z⟩ ⟩ suc f⟨z⟩
           ≡⟨ sym eq-f⟨z⟩          ⟩ f zero ∎
 
+    f⁻¹ : ∀ {n} → (f : Fin n → Fin n) → (f-surj : Surjective f) → (Fin n → Fin n)
+    f⁻¹ f f-surj x = proj₁ (f-surj x)
+
+    f⁻¹-inj : ∀ {n} → (f : Fin n → Fin n) → (f-surj : Surjective f) → Injective (f⁻¹ f f-surj)
+    f⁻¹-inj = {!!}
+
+    iso-f-f⁻² : ∀ {n} → (f : Fin n → Fin n) → (f-surj : Surjective f)
+                → ∀ x → f x ≡ f⁻¹ (f⁻¹ f f-surj) (Injection-to-Surjection _ (f⁻¹-inj f f-surj)) x
+    iso-f-f⁻² = {!!}
+
+    iso-f-h-inj : ∀ {n} → (f h : Fin n → Fin n) → (iso : ∀ i → f i ≡ h i) → (h-inj : Injective h) → Injective f
+    iso-f-h-inj = {!!}
+
+
   Injection-to-Surjection {ℕ.zero} f f-inj ()
   Injection-to-Surjection {ℕ.suc n} f f-inj y
     with (Surjective $ Lemmas.lfi f f-inj)
@@ -176,6 +190,8 @@ module FiniteSets where
   ... | lfi-surj
     = Lemmas.lfi-surj⇒f-surj f f-inj lfi-surj y
 
-  Surjection-to-Injection {ℕ.zero} f f-surj {()} f⟨x⟩≡f⟨y⟩
-  Surjection-to-Injection {ℕ.suc n} f f-surj f⟨x⟩≡f⟨y⟩ = {!!}
+  Surjection-to-Injection f f-surj f⟨x⟩≡f⟨y⟩
+    = let f⁻¹ = Lemmas.f⁻¹ f f-surj
+          h   = Lemmas.f⁻¹ f⁻¹ (Injection-to-Surjection f⁻¹ (Lemmas.f⁻¹-inj f f-surj))
+      in Lemmas.iso-f-h-inj f h (Lemmas.iso-f-f⁻² f f-surj) (Lemmas.f⁻¹-inj f⁻¹ ((Injection-to-Surjection f⁻¹ (Lemmas.f⁻¹-inj f f-surj)))) f⟨x⟩≡f⟨y⟩
 
